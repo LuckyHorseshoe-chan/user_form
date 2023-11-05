@@ -1,29 +1,39 @@
-import React from "react";
-import GoogleMapReact from 'google-map-react';
+import { useState } from 'react';
+import { YMaps, Map, Placemark } from '@pbe/react-yandex-maps';
 
-const AnyReactComponent = ({ text }: {text: string}) => <div>{text}</div>;
+export default function MapComponent() {
+  const [coords, setCoords] = useState([55.751574, 37.573856]);
+  const apiKey = 'ba8d249a-d94d-4173-af37-e5e8044349ac'
 
-export default function MapComponent(){
-  const defaultProps = {
-    center: {
-      lat: 10.99835602,
-      lng: 77.01502627
-    },
-    zoom: 11
+  const defaultState = {
+    center: [55.751574, 37.573856],
+    zoom: 5,
   };
 
+  function onMapClick(e: any){
+    setCoords(e.get("coords"))
+    console.log(coords)
+    fetch(`https://geocode-maps.yandex.ru/1.x/?apikey=${apiKey}&geocode=${coords[1]},${coords[0]}&lang=ru_RU&format=json`)
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["metaDataProperty"]["GeocoderMetaData"]["Address"]["formatted"])
+    })
+  }
+
   return (
-    // Important! Always set the container height explicitly
-    <div style={{ height: '100vh', width: '100%' }}>
-      <GoogleMapReact
-        bootstrapURLKeys={{ key: "" }}
-        defaultCenter={defaultProps.center}
-        defaultZoom={defaultProps.zoom}
-      >
-        <AnyReactComponent
-          text="My Marker"
-        />
-      </GoogleMapReact>
-    </div>
+    <YMaps query={{ apikey: apiKey }}>
+      <Map defaultState={defaultState} onClick={onMapClick}>
+        {/* <Placemark geometry={coords}
+        properties={
+          {
+            balloonHeader: 'Заголовок балуна',
+            balloonContent: 'Контент балуна',
+            balloonFooter: 'Футер балуна',
+            balloonShadow: true,
+            balloonPanelMaxMapArea: 1
+          }
+        }/> */}
+      </Map>
+    </YMaps>
   );
 }
