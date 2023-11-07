@@ -1,6 +1,7 @@
 import { ChangeEvent, useState, useRef } from 'react';
 import { useForm } from 'react-hook-form'
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
+import axios from 'axios';
 import {
   FormErrorMessage,
   FormLabel,
@@ -27,32 +28,27 @@ import {
 } from '../features/formSlice';
 import EditableControls from './EditableControls';
 
-type FormData = {
-    firstName: string
-    lastName: string
-    patronymic: string
-    email: string
-    phone: string
-    address: string
-}
-
 function Form(){
-    const {
-        register,
-        formState: { errors, isSubmitting },
-    } = useForm<FormData>()
+    const [errors, setErrors] = useState({
+        firstName: '',
+        lastName: '',
+        patronymic: '',
+        email: '',
+        phone: ''
+    })
 
     const [fileList, setFileList] = useState<File[]>([]);
     const [fileMessage, setFileMessage] = useState('')
     const [_size, setSize] = useState(0)
     const [strSize, setStrSize] = useState('0 KB')
     const [fileNames, setFileNames] = useState<string[]>([])
+    const [msg, setMsg] = useState('')
+    const [success, setSuccess] = useState('')
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const form = useAppSelector(selectForm)
     const dispatch = useAppDispatch()
     
-    // const files = fileList ? Array.from(fileList) : [];
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files) {
             return;
@@ -83,30 +79,45 @@ function Form(){
         if(fileInputRef.current) {fileInputRef.current.click()}
     }
 
-
-    const handleUploadClick = () => {
-        if (!fileList.length) {
-            return;
-        }
-
-        // 👇 Create new FormData object and append files
-        const data = new FormData();
-        fileList.forEach((file: File, i: number) => {
-            data.append(`file-${i}`, file, file.name);
-        });
-
-        // 👇 Uploading the files using the fetch API to the server
-        // fetch('https://httpbin.org/post', {
-        //   method: 'POST',
-        //   body: data,
-        // })
-        //   .then((res) => res.json())
-        //   .then((data) => console.log(data))
-        //   .catch((err) => console.error(err));
-    };
-
     function onSubmit(e: React.MouseEvent<HTMLButtonElement>) {
-        console.log(form)
+        setMsg('')
+        setSuccess('')
+        const openInNewTab = (url: string) => {
+            window.open(url, "_blank", "noreferrer");
+        };
+        fetch('http://localhost:8000/data', {
+            method: 'POST',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({"data": form}),
+        })
+        .then((res) => res.json())
+        .then((data) => {
+            if (data['message'] !== 'ок') setMsg(data['message'])
+            else openInNewTab(`http://localhost:8080/${data['id']}.pdf`)
+        })
+        .catch((err) => {
+            console.log(err)
+            setMsg("Не удалось подключиться к серверу")
+        })
+        if (!fileList.length) return;
+        let formData = new FormData();
+        for (var i = 0; i < fileList.length; i++){
+            formData.append('files', fileList[i])
+        }
+        axios.post('http://localhost:8000/files', formData, { 
+            headers: { "Content-Type": "multipart/form-data" }
+        })
+        .then((data) => {
+            if (msg === '') setSuccess("Форма успешно отправлена")
+            setFileList([])
+            setFileNames([])
+            setStrSize('0 KB')
+            setSize(0)
+        })
+        .catch((err) => {
+            console.log(err)
+            setMsg("Не удалось подключиться к серверу")
+        })
       }
 
     return(
@@ -117,76 +128,138 @@ function Form(){
                         <FormLabel htmlFor='lastName'>Фамилия</FormLabel>
                         <Input
                             id='lastName'
-                            {...register('lastName', {
-                                required: 'Это обязательное поле!',
-                                pattern: {value: /^[А-ЯЁ][а-яё]+$/, message: 'Некорректные данные'}
-                            })}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => dispatch(setLastName(e.target.value))}
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                const text = e.target.value
+                                dispatch(setLastName(text))
+                                const check = text.match(/^[А-ЯЁ][а-яё]+$/)
+                                const tmp = errors
+                                if (!(/^[А-ЯЁ][а-яё]+$/.test(text)) ||
+                                    ((check != null) && (text !== check[0]))) {
+                                        tmp.lastName = 'Некорректные данные'
+                                    }
+                                else {
+                                    tmp.lastName = ''
+                                } 
+                                if (text === ''){
+                                    tmp.lastName = 'Это обязательное поле!'
+                                }
+                                setErrors(tmp)
+                            }}
                             isInvalid={errors.lastName ? true : false}
                         />
                         <Text color='red'>
-                            {errors.lastName?.message}
+                            {errors.lastName}
                         </Text>
                         <FormLabel htmlFor='firstName'>Имя</FormLabel>
                         <Input
                             id='firstName'
-                            {...register('firstName', {
-                                required: 'Это обязательное поле!',
-                                pattern: {value: /^[А-ЯЁ][а-яё]+$/, message: 'Некорректные данные'}
-                            })}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => dispatch(setFirstName(e.target.value))}
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                                {
+                                    const text = e.target.value
+                                    dispatch(setFirstName(text))
+                                    const check = text.match(/^[А-ЯЁ][а-яё]+$/)
+                                    const tmp = errors
+                                    if (!(/^[А-ЯЁ][а-яё]+$/.test(text)) ||
+                                        ((check != null) && (text !== check[0]))) {
+                                            tmp.firstName = 'Некорректные данные'
+                                        }
+                                    else {
+                                        tmp.firstName = ''
+                                    } 
+                                    if (text === ''){
+                                        tmp.firstName = 'Это обязательное поле!'
+                                    }
+                                    setErrors(tmp)
+                                }
+                            }
                             isInvalid={errors.firstName ? true : false}
                         />
                         <Text color='red'>
-                            {errors.firstName?.message}
+                            {errors.firstName}
                         </Text>
                         <FormLabel htmlFor='patronymic'>Отчество</FormLabel>
                         <Input
                             id='patronymic'
-                            {...register('patronymic', {
-                                required: false,
-                                pattern: {value: /^[А-ЯЁ][а-яё]+$/, message: 'Некорректные данные'}
-                            })}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => dispatch(setPatronymic(e.target.value))}
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                                {
+                                    const text = e.target.value
+                                    dispatch(setPatronymic(text))
+                                    const check = text.match(/^[А-ЯЁ][а-яё]+$/)
+                                    const tmp = errors
+                                    if (!(/^[А-ЯЁ][а-яё]+$/.test(text)) ||
+                                        ((check != null) && (text !== check[0]))) {
+                                            tmp.patronymic = 'Некорректные данные'
+                                        }
+                                    else {
+                                        tmp.patronymic = ''
+                                    }
+                                    setErrors(tmp)
+                                }
+                            }
                             isInvalid={errors.patronymic ? true : false}
                         />
                         <Text color='red'>
-                            {errors.patronymic?.message}
+                            {errors.patronymic}
                         </Text>
                         <FormLabel htmlFor='email'>Email</FormLabel>
                         <Input
                             id='email'
-                            {...register('email', {
-                                required: 'Это обязательное поле!',
-                                pattern: {value: /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/, message: 'Некорректные данные'}
-                            })}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => dispatch(setEmail(e.target.value))}
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                                {
+                                    const text = e.target.value
+                                    dispatch(setEmail(text))
+                                    const check = text.match(/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/)
+                                    const tmp = errors
+                                    if (!(/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/.test(text)) ||
+                                        ((check != null) && (text !== check[0]))) {
+                                            tmp.email = 'Некорректные данные'
+                                        }
+                                    else {
+                                        tmp.email = ''
+                                    } 
+                                    if (text === ''){
+                                        tmp.email = 'Это обязательное поле!'
+                                    }
+                                    setErrors(tmp)
+                                }
+                            }
                             isInvalid={errors.email ? true : false}
                         />
                         <Text color='red'>
-                            {errors.email?.message}
+                            {errors.email}
                         </Text>
                         <FormLabel htmlFor='phone'>Телефон</FormLabel>
                         <Input
                             id='phone'
-                            placeholder="+7 (999) 999-99-99"
-                            {...register('phone', {
-                                required: 'Это обязательное поле!',
-                                pattern: {value: /\+7\(\d{3}\)\d{3}-\d{2}-\d{2}/, message: 'Некорректные данные'}
-                            })}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => dispatch(setPhone(e.target.value))}
+                            placeholder="+79999999999"
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                                {
+                                    const text = e.target.value
+                                    dispatch(setPhone(text))
+                                    const check = text.match(/\+7\d{10}/)
+                                    const tmp = errors
+                                    if (!(/\+7\d{10}/.test(text)) ||
+                                        (check != null) && (text !== check[0])) {
+                                            tmp.phone = 'Некорректные данные'
+                                        }
+                                    else {
+                                        tmp.phone = ''
+                                    } 
+                                    if (text === ''){
+                                        tmp.phone = 'Это обязательное поле!'
+                                    }
+                                    setErrors(tmp)
+                                }
+                            }
                             isInvalid={errors.phone ? true : false}
                         />
                         <Text color='red'>
-                            {errors.phone?.message}
+                            {errors.phone}
                         </Text>
                         <FormLabel htmlFor='address'>Адрес</FormLabel>
                         <Input
                             id='address'
                             value={form[5].value}
-                            {...register('address', {
-                                required: 'Это обязательное поле!',
-                            })}
                             isDisabled
                         />
                         <MapComponent/>
@@ -222,7 +295,7 @@ function Form(){
                                     <Flex mt={3}>
                                         <EditablePreview />
                                         <Input as={EditableInput} onChange={(e: ChangeEvent<HTMLInputElement>) => 
-                                            dispatch(setExtraFieldName({index: i, value: e.target.value}))}/>
+                                            dispatch(setExtraFieldName({index: 6 + i, value: e.target.value}))}/>
                                         <EditableControls />
                                         <IconButton 
                                             aria-label='delete' 
@@ -243,17 +316,14 @@ function Form(){
                             </Button>
                             <Spacer/>
                         </Flex>
-                    </FormControl>
-                    {/* <ul>
-                        {fileList.map((file, i) => (
-                        <li key={i}>
-                            {file.name} - {file.type}
-                        </li>
-                        ))}
-                    </ul> */}
+                    </FormControl>   
+                    <Text color='red'>{msg}</Text>
+                    <Text color='green'>
+                        {success}
+                    </Text>
                     <Flex>
                         <Spacer/>
-                        <Button mt={4} colorScheme='teal' isLoading={isSubmitting} type='submit' onClick={onSubmit}>
+                        <Button mt={4} colorScheme='teal' onClick={onSubmit}>
                             Submit
                         </Button>
                     </Flex>
