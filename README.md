@@ -7,7 +7,9 @@ uvicorn main:app --reload
   
 Запустить файловый сервер:  
 ```
-cd backend/reports
+cd backend
+mkdir reports
+cd reports
 python -m http.server 8080
 ```
   
