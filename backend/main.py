@@ -35,18 +35,20 @@ async def data(form: dict):
         page = document.pages.add()
         table = pd.read_csv('table.csv', sep=';')
         for item in form["data"]:
-            text_fragment = ap.text.TextFragment(f"{item['name']}: {item['value']}")
-            page.paragraphs.add(text_fragment)
             if item["name"] in list(table.columns):
                 df[item["name"]] = item["value"]
             else:
                 extra[item["name"]] = item["value"]
             success, error = validate(item)
+            if not len(errors):
+                text_fragment = ap.text.TextFragment(f"{item['name']}: {item['value']}")
+                page.paragraphs.add(text_fragment)
             if not success:
                 errors.append(error)
         df['id'] = str(uuid.uuid4())[:8]
         user_id = df['id']
-        document.save(f"reports/{df['id']}.pdf")
+        if not len(errors):
+            document.save(f"reports/{df['id']}.pdf")
         table.loc[len(table)] = df
         table.to_csv('table.csv', sep=';', index=False)
     except:
@@ -57,13 +59,17 @@ async def data(form: dict):
 
 @app.post("/files")
 async def files(files: List[UploadFile] = File(...)):
-    table = pd.read_csv('table.csv', sep=';')
-    file_location = f"files/{table.iloc[-1]['id']}"
-    os.mkdir(file_location)
-    for uploaded_file in files:
-        with open(f'{file_location}/{uploaded_file.filename}', "wb+") as file_object:
-            file_object.write(uploaded_file.file.read())
-    return {"filenames": [file.filename for file in files]}
+    msg = 'ок'
+    try:
+        table = pd.read_csv('table.csv', sep=';')
+        file_location = f"files/{table.iloc[-1]['id']}"
+        os.mkdir(file_location)
+        for uploaded_file in files:
+            with open(f'{file_location}/{uploaded_file.filename}', "wb+") as file_object:
+                file_object.write(uploaded_file.file.read())
+    except:
+        msg = "не удалось отправить файлы"
+    return {"message": msg}
 
 
 def validate(item):
@@ -87,4 +93,7 @@ def validate(item):
         pattern = re.compile('^\\+?7[0-9]{10}$')
         if not bool(pattern.fullmatch(item["value"])):
             return False, "некорректный телефон"
+    if item["name"] == "address":
+        if item["value"] == "":
+            return False, "адрес не задан"
     return True, ""
