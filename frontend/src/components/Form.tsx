@@ -92,25 +92,26 @@ function Form(){
         .then((data) => {
             if (data['message'] !== 'ок') setMsg(data['message'])
             else openInNewTab(`http://localhost:8080/${data['id']}.pdf`)
-        })
-        .catch((err) => {
-            console.log(err)
-            setMsg("Не удалось подключиться к серверу")
-        })
-        if (!fileList.length || msg !== '') return;
-        let formData = new FormData();
-        for (var i = 0; i < fileList.length; i++){
-            formData.append('files', fileList[i])
-        }
-        axios.post('http://localhost:8000/files', formData, { 
-            headers: { "Content-Type": "multipart/form-data" }
-        })
-        .then((data) => {
-            if (msg === '') setSuccess("Форма успешно отправлена")
-            setFileList([])
-            setFileNames([])
-            setStrSize('0 KB')
-            setSize(0)
+            if (fileList.length && data['message'] === 'ок'){
+                let formData = new FormData();
+                for (var i = 0; i < fileList.length; i++){
+                    formData.append('files', fileList[i])
+                }
+                axios.post('http://localhost:8000/files', formData, { 
+                    headers: { "Content-Type": "multipart/form-data" }
+                })
+                .then((data) => {
+                    if (msg === '') setSuccess("Форма успешно отправлена")
+                    setFileList([])
+                    setFileNames([])
+                    setStrSize('0 KB')
+                    setSize(0)
+                })
+                .catch((err) => {
+                    console.log(err)
+                    setMsg("Не удалось подключиться к серверу")
+                })
+            }
         })
         .catch((err) => {
             console.log(err)
