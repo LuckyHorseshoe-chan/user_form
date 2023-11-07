@@ -1,9 +1,7 @@
 import { ChangeEvent, useState, useRef } from 'react';
-import { useForm } from 'react-hook-form'
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
 import axios from 'axios';
 import {
-  FormErrorMessage,
   FormLabel,
   FormControl,
   Input,
@@ -15,7 +13,6 @@ import {
   Spacer,
   EditableInput,
   Editable,
-  EditableTextarea,
   EditablePreview,
   IconButton
 } from '@chakra-ui/react'
