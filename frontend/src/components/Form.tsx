@@ -1,5 +1,6 @@
 import { ChangeEvent, useState, useRef } from 'react';
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons'
+import { Link } from 'react-router-dom'
 import axios from 'axios';
 import {
   FormLabel,
@@ -118,215 +119,221 @@ function Form(){
       }
 
     return(
-        <Center>
-            <Box w='50vw' mt={10}>
-                <form>
-                    <FormControl>
-                        <FormLabel htmlFor='lastName'>Фамилия</FormLabel>
-                        <Input
-                            id='lastName'
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                                const text = e.target.value
-                                dispatch(setLastName(text))
-                                const check = text.match(/^[А-ЯЁ][а-яё]+$/)
-                                const tmp = errors
-                                if (!(/^[А-ЯЁ][а-яё]+$/.test(text)) ||
-                                    ((check != null) && (text !== check[0]))) {
-                                        tmp.lastName = 'Некорректные данные'
-                                    }
-                                else {
-                                    tmp.lastName = ''
-                                } 
-                                if (text === ''){
-                                    tmp.lastName = 'Это обязательное поле!'
-                                }
-                                setErrors(tmp)
-                            }}
-                            isInvalid={errors.lastName ? true : false}
-                        />
-                        <Text color='red'>
-                            {errors.lastName}
-                        </Text>
-                        <FormLabel htmlFor='firstName'>Имя</FormLabel>
-                        <Input
-                            id='firstName'
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => 
-                                {
+        <Box>
+            <Flex p={3}>
+                <Spacer/>
+                <Link to='/mobile'>Мобильная версия</Link>
+            </Flex>
+            <Center>
+                <Box w='50vw' mt={5}>
+                    <form>
+                        <FormControl>
+                            <FormLabel htmlFor='lastName'>Фамилия</FormLabel>
+                            <Input
+                                id='lastName'
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => {
                                     const text = e.target.value
-                                    dispatch(setFirstName(text))
+                                    dispatch(setLastName(text))
                                     const check = text.match(/^[А-ЯЁ][а-яё]+$/)
                                     const tmp = errors
                                     if (!(/^[А-ЯЁ][а-яё]+$/.test(text)) ||
                                         ((check != null) && (text !== check[0]))) {
-                                            tmp.firstName = 'Некорректные данные'
+                                            tmp.lastName = 'Некорректные данные'
                                         }
                                     else {
-                                        tmp.firstName = ''
+                                        tmp.lastName = ''
                                     } 
                                     if (text === ''){
-                                        tmp.firstName = 'Это обязательное поле!'
+                                        tmp.lastName = 'Это обязательное поле!'
                                     }
                                     setErrors(tmp)
-                                }
-                            }
-                            isInvalid={errors.firstName ? true : false}
-                        />
-                        <Text color='red'>
-                            {errors.firstName}
-                        </Text>
-                        <FormLabel htmlFor='patronymic'>Отчество</FormLabel>
-                        <Input
-                            id='patronymic'
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => 
-                                {
-                                    const text = e.target.value
-                                    dispatch(setPatronymic(text))
-                                    const check = text.match(/^[А-ЯЁ][а-яё]+$/)
-                                    const tmp = errors
-                                    if (!(/^[А-ЯЁ][а-яё]+$/.test(text)) ||
-                                        ((check != null) && (text !== check[0]))) {
-                                            tmp.patronymic = 'Некорректные данные'
+                                }}
+                                isInvalid={errors.lastName ? true : false}
+                            />
+                            <Text color='red'>
+                                {errors.lastName}
+                            </Text>
+                            <FormLabel htmlFor='firstName'>Имя</FormLabel>
+                            <Input
+                                id='firstName'
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                                    {
+                                        const text = e.target.value
+                                        dispatch(setFirstName(text))
+                                        const check = text.match(/^[А-ЯЁ][а-яё]+$/)
+                                        const tmp = errors
+                                        if (!(/^[А-ЯЁ][а-яё]+$/.test(text)) ||
+                                            ((check != null) && (text !== check[0]))) {
+                                                tmp.firstName = 'Некорректные данные'
+                                            }
+                                        else {
+                                            tmp.firstName = ''
+                                        } 
+                                        if (text === ''){
+                                            tmp.firstName = 'Это обязательное поле!'
                                         }
-                                    else {
-                                        tmp.patronymic = ''
+                                        setErrors(tmp)
                                     }
-                                    setErrors(tmp)
                                 }
-                            }
-                            isInvalid={errors.patronymic ? true : false}
-                        />
-                        <Text color='red'>
-                            {errors.patronymic}
-                        </Text>
-                        <FormLabel htmlFor='email'>Email</FormLabel>
-                        <Input
-                            id='email'
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => 
-                                {
-                                    const text = e.target.value
-                                    dispatch(setEmail(text))
-                                    const check = text.match(/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/)
-                                    const tmp = errors
-                                    if (!(/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/.test(text)) ||
-                                        ((check != null) && (text !== check[0]))) {
-                                            tmp.email = 'Некорректные данные'
+                                isInvalid={errors.firstName ? true : false}
+                            />
+                            <Text color='red'>
+                                {errors.firstName}
+                            </Text>
+                            <FormLabel htmlFor='patronymic'>Отчество</FormLabel>
+                            <Input
+                                id='patronymic'
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                                    {
+                                        const text = e.target.value
+                                        dispatch(setPatronymic(text))
+                                        const check = text.match(/^[А-ЯЁ][а-яё]+$/)
+                                        const tmp = errors
+                                        if (!(/^[А-ЯЁ][а-яё]+$/.test(text)) ||
+                                            ((check != null) && (text !== check[0]))) {
+                                                tmp.patronymic = 'Некорректные данные'
+                                            }
+                                        else {
+                                            tmp.patronymic = ''
                                         }
-                                    else {
-                                        tmp.email = ''
-                                    } 
-                                    if (text === ''){
-                                        tmp.email = 'Это обязательное поле!'
+                                        setErrors(tmp)
                                     }
-                                    setErrors(tmp)
                                 }
-                            }
-                            isInvalid={errors.email ? true : false}
-                        />
-                        <Text color='red'>
-                            {errors.email}
-                        </Text>
-                        <FormLabel htmlFor='phone'>Телефон</FormLabel>
-                        <Input
-                            id='phone'
-                            placeholder="+79999999999"
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => 
-                                {
-                                    const text = e.target.value
-                                    dispatch(setPhone(text))
-                                    const check = text.match(/\+7\d{10}/)
-                                    const tmp = errors
-                                    if (!(/\+7\d{10}/.test(text)) ||
-                                        (check != null) && (text !== check[0])) {
-                                            tmp.phone = 'Некорректные данные'
+                                isInvalid={errors.patronymic ? true : false}
+                            />
+                            <Text color='red'>
+                                {errors.patronymic}
+                            </Text>
+                            <FormLabel htmlFor='email'>Email</FormLabel>
+                            <Input
+                                id='email'
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                                    {
+                                        const text = e.target.value
+                                        dispatch(setEmail(text))
+                                        const check = text.match(/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/)
+                                        const tmp = errors
+                                        if (!(/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/.test(text)) ||
+                                            ((check != null) && (text !== check[0]))) {
+                                                tmp.email = 'Некорректные данные'
+                                            }
+                                        else {
+                                            tmp.email = ''
+                                        } 
+                                        if (text === ''){
+                                            tmp.email = 'Это обязательное поле!'
                                         }
-                                    else {
-                                        tmp.phone = ''
-                                    } 
-                                    if (text === ''){
-                                        tmp.phone = 'Это обязательное поле!'
+                                        setErrors(tmp)
                                     }
-                                    setErrors(tmp)
                                 }
-                            }
-                            isInvalid={errors.phone ? true : false}
-                        />
-                        <Text color='red'>
-                            {errors.phone}
+                                isInvalid={errors.email ? true : false}
+                            />
+                            <Text color='red'>
+                                {errors.email}
+                            </Text>
+                            <FormLabel htmlFor='phone'>Телефон</FormLabel>
+                            <Input
+                                id='phone'
+                                placeholder="+79999999999"
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                                    {
+                                        const text = e.target.value
+                                        dispatch(setPhone(text))
+                                        const check = text.match(/\+7\d{10}/)
+                                        const tmp = errors
+                                        if (!(/\+7\d{10}/.test(text)) ||
+                                            (check != null) && (text !== check[0])) {
+                                                tmp.phone = 'Некорректные данные'
+                                            }
+                                        else {
+                                            tmp.phone = ''
+                                        } 
+                                        if (text === ''){
+                                            tmp.phone = 'Это обязательное поле!'
+                                        }
+                                        setErrors(tmp)
+                                    }
+                                }
+                                isInvalid={errors.phone ? true : false}
+                            />
+                            <Text color='red'>
+                                {errors.phone}
+                            </Text>
+                            <FormLabel htmlFor='address'>Адрес</FormLabel>
+                            <Input
+                                id='address'
+                                value={form[5].value}
+                                isDisabled
+                            />
+                            <MapComponent/>
+                            <FormLabel>Загрузка файлов</FormLabel>
+                            <Flex>
+                                <Button onClick={chooseFile}>
+                                    Choose file
+                                </Button>
+                                <Center>
+                                    <Text ml={2}>{strSize}</Text>
+                                </Center>
+                                <Spacer/>
+                            </Flex>
+                            <Flex>
+                                <Text noOfLines={1}>{fileNames.join(', ')}</Text>
+                                <Spacer/>
+                            </Flex>
+                            <Text color='red'>{fileMessage}</Text>
+                            <Input 
+                                type="file"
+                                ref={fileInputRef} 
+                                style={{ display: 'none'}}
+                                onChange={handleFileChange} 
+                                multiple />
+                            {form.slice(6)?.map((item: any, i: number) => (
+                                <Box>
+                                    <Editable
+                                    textAlign='center'
+                                    defaultValue='Название'
+                                    as='b'
+                                    isPreviewFocusable={false}
+                                    >
+                                        <Flex mt={3}>
+                                            <EditablePreview />
+                                            <Input as={EditableInput} onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                                                dispatch(setExtraFieldName({index: 6 + i, value: e.target.value}))}/>
+                                            <EditableControls />
+                                            <IconButton 
+                                                aria-label='delete' 
+                                                bg='red.500' 
+                                                icon={<DeleteIcon color='white'/>}
+                                                onClick={() => dispatch(removeField(6 + i))} 
+                                                size='sm' 
+                                                ml={1}/>
+                                        </Flex>
+                                    </Editable>
+                                    <Input mt={3} onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                                                dispatch(setExtraFieldValue({index: 6 + i, value: e.target.value}))}/>
+                                </Box> 
+                            ))}
+                            <Flex mt={5}>
+                                <Button onClick={() => dispatch(addField())} color='white' bg='blue.400'>
+                                    <AddIcon mr={2}/> Добавить поле
+                                </Button>
+                                <Spacer/>
+                            </Flex>
+                        </FormControl>   
+                        <Text color='red'>{msg}</Text>
+                        <Text color='green'>
+                            {success}
                         </Text>
-                        <FormLabel htmlFor='address'>Адрес</FormLabel>
-                        <Input
-                            id='address'
-                            value={form[5].value}
-                            isDisabled
-                        />
-                        <MapComponent/>
-                        <FormLabel>Загрузка файлов</FormLabel>
                         <Flex>
-                            <Button onClick={chooseFile}>
-                                Choose file
+                            <Spacer/>
+                            <Button mt={4} colorScheme='teal' onClick={onSubmit}>
+                                Submit
                             </Button>
-                            <Center>
-                                <Text ml={2}>{strSize}</Text>
-                            </Center>
-                            <Spacer/>
                         </Flex>
-                        <Flex>
-                            <Text noOfLines={1}>{fileNames.join(', ')}</Text>
-                            <Spacer/>
-                        </Flex>
-                        <Text color='red'>{fileMessage}</Text>
-                        <Input 
-                            type="file"
-                            ref={fileInputRef} 
-                            style={{ display: 'none'}}
-                            onChange={handleFileChange} 
-                            multiple />
-                        {form.slice(6)?.map((item: any, i: number) => (
-                            <Box>
-                                <Editable
-                                textAlign='center'
-                                defaultValue='Название'
-                                as='b'
-                                isPreviewFocusable={false}
-                                >
-                                    <Flex mt={3}>
-                                        <EditablePreview />
-                                        <Input as={EditableInput} onChange={(e: ChangeEvent<HTMLInputElement>) => 
-                                            dispatch(setExtraFieldName({index: 6 + i, value: e.target.value}))}/>
-                                        <EditableControls />
-                                        <IconButton 
-                                            aria-label='delete' 
-                                            bg='red.500' 
-                                            icon={<DeleteIcon color='white'/>}
-                                            onClick={() => dispatch(removeField(6 + i))} 
-                                            size='sm' 
-                                            ml={1}/>
-                                    </Flex>
-                                </Editable>
-                                <Input mt={3} onChange={(e: ChangeEvent<HTMLInputElement>) => 
-                                            dispatch(setExtraFieldValue({index: 6 + i, value: e.target.value}))}/>
-                            </Box> 
-                        ))}
-                        <Flex mt={5}>
-                            <Button onClick={() => dispatch(addField())} color='white' bg='blue.400'>
-                                <AddIcon mr={2}/> Добавить поле
-                            </Button>
-                            <Spacer/>
-                        </Flex>
-                    </FormControl>   
-                    <Text color='red'>{msg}</Text>
-                    <Text color='green'>
-                        {success}
-                    </Text>
-                    <Flex>
-                        <Spacer/>
-                        <Button mt={4} colorScheme='teal' onClick={onSubmit}>
-                            Submit
-                        </Button>
-                    </Flex>
-                </form>
-            </Box>
-        </Center>
+                    </form>
+                </Box>
+            </Center>
+        </Box>
     )
 }
 
