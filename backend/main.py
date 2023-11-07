@@ -48,6 +48,8 @@ async def data(form: dict):
         df['id'] = str(uuid.uuid4())[:8]
         user_id = df['id']
         if not len(errors):
+            if not os.path.exists("reports"):
+                os.mkdir("reports")
             document.save(f"reports/{df['id']}.pdf")
         table.loc[len(table)] = df
         table.to_csv('table.csv', sep=';', index=False)
@@ -61,6 +63,8 @@ async def data(form: dict):
 async def files(files: List[UploadFile] = File(...)):
     msg = 'ок'
     try:
+        if not os.path.exists("files"):
+            os.mkdir("files")
         table = pd.read_csv('table.csv', sep=';')
         file_location = f"files/{table.iloc[-1]['id']}"
         os.mkdir(file_location)
