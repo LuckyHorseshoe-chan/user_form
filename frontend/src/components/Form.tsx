@@ -97,7 +97,7 @@ function Form(){
             console.log(err)
             setMsg("Не удалось подключиться к серверу")
         })
-        if (!fileList.length) return;
+        if (!fileList.length || msg !== '') return;
         let formData = new FormData();
         for (var i = 0; i < fileList.length; i++){
             formData.append('files', fileList[i])
